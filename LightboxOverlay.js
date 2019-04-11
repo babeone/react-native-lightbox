@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Animated, Dimensions, Modal, PanResponder, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const WINDOW_HEIGHT = Dimensions.get('window').height;
-const WINDOW_WIDTH = Dimensions.get('window').width;
+const WINDOW_HEIGHT = Dimensions.get('screen').height; //changed from window to screen, because the window in fullScreen mode give the dith or height - soft menu bar. screen give the full height and width ignoring the soft menu bar
+const WINDOW_WIDTH = Dimensions.get('screen').width;  //changed from window to screen, because the window in fullScreen mode give the dith or height - soft menu bar. screen give the full height and width ignoring the soft menu bar
 const DRAG_DISMISS_THRESHOLD = 150;
 const STATUS_BAR_OFFSET = (Platform.OS === 'android' ? -25 : 0);
 const isIOS = Platform.OS === 'ios';
@@ -49,22 +49,22 @@ const styles = StyleSheet.create({
 export default class LightboxOverlay extends Component {
   static propTypes = {
     origin: PropTypes.shape({
-      x:        PropTypes.number,
-      y:        PropTypes.number,
-      width:    PropTypes.number,
-      height:   PropTypes.number,
+      x: PropTypes.number,
+      y: PropTypes.number,
+      width: PropTypes.number,
+      height: PropTypes.number,
     }),
     springConfig: PropTypes.shape({
-      tension:  PropTypes.number,
+      tension: PropTypes.number,
       friction: PropTypes.number,
     }),
     backgroundColor: PropTypes.string,
-    isOpen:          PropTypes.bool,
-    renderHeader:    PropTypes.func,
-    onOpen:          PropTypes.func,
-    onClose:         PropTypes.func,
-    willClose:         PropTypes.func,
-    swipeToDismiss:  PropTypes.bool,
+    isOpen: PropTypes.bool,
+    renderHeader: PropTypes.func,
+    onOpen: PropTypes.func,
+    onClose: PropTypes.func,
+    willClose: PropTypes.func,
+    swipeToDismiss: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -102,7 +102,7 @@ export default class LightboxOverlay extends Component {
       ]),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
-        if(Math.abs(gestureState.dy) > DRAG_DISMISS_THRESHOLD) {
+        if (Math.abs(gestureState.dy) > DRAG_DISMISS_THRESHOLD) {
           this.setState({
             isPanning: false,
             target: {
@@ -123,13 +123,13 @@ export default class LightboxOverlay extends Component {
   }
 
   componentDidMount() {
-    if(this.props.isOpen) {
+    if (this.props.isOpen) {
       this.open();
     }
   }
 
   open = () => {
-    if(isIOS) {
+    if (isIOS) {
       StatusBar.setHidden(true, 'fade');
     }
     this.state.pan.setValue(0);
@@ -153,7 +153,7 @@ export default class LightboxOverlay extends Component {
 
   close = () => {
     this.props.willClose();
-    if(isIOS) {
+    if (isIOS) {
       StatusBar.setHidden(false, 'fade');
     }
     this.setState({
@@ -171,7 +171,7 @@ export default class LightboxOverlay extends Component {
   }
 
   componentWillReceiveProps(props) {
-    if(this.props.isOpen != props.isOpen && props.isOpen) {
+    if (this.props.isOpen != props.isOpen && props.isOpen) {
       this.open();
     }
   }
@@ -193,27 +193,27 @@ export default class LightboxOverlay extends Component {
     } = this.state;
 
     const lightboxOpacityStyle = {
-      opacity: openVal.interpolate({inputRange: [0, 1], outputRange: [0, target.opacity]})
+      opacity: openVal.interpolate({ inputRange: [0, 1], outputRange: [0, target.opacity] })
     };
 
     let handlers;
-    if(swipeToDismiss) {
+    if (swipeToDismiss) {
       handlers = this._panResponder.panHandlers;
     }
 
     let dragStyle;
-    if(isPanning) {
+    if (isPanning) {
       dragStyle = {
         top: this.state.pan,
       };
-      lightboxOpacityStyle.opacity = this.state.pan.interpolate({inputRange: [-WINDOW_HEIGHT, 0, WINDOW_HEIGHT], outputRange: [0, 1, 0]});
+      lightboxOpacityStyle.opacity = this.state.pan.interpolate({ inputRange: [-WINDOW_HEIGHT, 0, WINDOW_HEIGHT], outputRange: [0, 1, 0] });
     }
 
     const openStyle = [styles.open, {
-      left:   openVal.interpolate({inputRange: [0, 1], outputRange: [origin.x, target.x]}),
-      top:    openVal.interpolate({inputRange: [0, 1], outputRange: [origin.y + STATUS_BAR_OFFSET, target.y + STATUS_BAR_OFFSET]}),
-      width:  openVal.interpolate({inputRange: [0, 1], outputRange: [origin.width, WINDOW_WIDTH]}),
-      height: openVal.interpolate({inputRange: [0, 1], outputRange: [origin.height, WINDOW_HEIGHT]}),
+      left: openVal.interpolate({ inputRange: [0, 1], outputRange: [origin.x, target.x] }),
+      top: openVal.interpolate({ inputRange: [0, 1], outputRange: [origin.y + STATUS_BAR_OFFSET, target.y + STATUS_BAR_OFFSET] }),
+      width: openVal.interpolate({ inputRange: [0, 1], outputRange: [origin.width, WINDOW_WIDTH] }),
+      height: openVal.interpolate({ inputRange: [0, 1], outputRange: [origin.height, WINDOW_HEIGHT] }),
     }];
 
     const background = (<Animated.View style={[styles.background, { backgroundColor: backgroundColor }, lightboxOpacityStyle]}></Animated.View>);
